@@ -9,12 +9,12 @@ public class PlanWorker : LLMWorker
     {
     }
 
-    public override Task<string> QueryAsync(QueryRequest request)
+    public override Task<ChatHistory> QueryAsync(QueryRequest request)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<string> GenerateAsync(GenerationRequest request)
+    public override Task<ChatHistory> GenerateAsync(GenerationRequest request)
     {
         throw new NotImplementedException();
     }

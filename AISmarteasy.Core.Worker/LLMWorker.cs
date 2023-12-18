@@ -16,11 +16,11 @@ public abstract class LLMWorker
 
     public AIServiceConnector? AIServiceConnector { get; set; }
 
-    public abstract Task<string> QueryAsync(QueryRequest request);
-    public abstract Task<string> GenerateAsync(GenerationRequest request);
+    public abstract Task<ChatHistory> QueryAsync(QueryRequest request);
+    public abstract Task<ChatHistory> GenerateAsync(GenerationRequest request);
 
-    protected virtual async Task<string> RunAsync(string prompt, LLMServiceSetting requestSetting, CancellationToken cancellationToken)
+    protected virtual async Task<ChatHistory> RunAsync(ChatHistory chatHistory, LLMServiceSetting requestSetting, CancellationToken cancellationToken)
     {
-        return await AIServiceConnector!.TextCompletionAsync(prompt, requestSetting, cancellationToken);
+        return await AIServiceConnector!.ChatCompletionAsync(chatHistory, requestSetting, cancellationToken);
     }
 }

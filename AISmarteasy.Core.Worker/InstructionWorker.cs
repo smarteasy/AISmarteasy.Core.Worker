@@ -9,14 +9,13 @@ public class InstructionWorker : LLMWorker
     {
     }
 
-    public override async Task<string> QueryAsync(QueryRequest request)
+    public override async Task<ChatHistory> QueryAsync(QueryRequest request)
     {
-        return await RunAsync(request.Query, request.ServiceSetting, request.CancellationToken);
+        return await RunAsync(request.ChatHistory, request.ServiceSetting, request.CancellationToken);
     }
 
-    public override async Task<string> GenerateAsync(GenerationRequest request)
+    public override Task<ChatHistory> GenerateAsync(GenerationRequest request)
     {
-        var prompt = "";
-        return await RunAsync(prompt, request.ServiceSetting, request.CancellationToken);
+        throw new NotImplementedException();
     }
 }
