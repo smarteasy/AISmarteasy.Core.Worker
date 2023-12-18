@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="WorkerEnv.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AISmarteasy.Core.Worker\AISmarteasy.Core.Worker.csproj" />
   </ItemGroup>
 
