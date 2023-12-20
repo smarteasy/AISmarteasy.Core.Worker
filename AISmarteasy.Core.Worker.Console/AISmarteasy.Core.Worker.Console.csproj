@@ -8,6 +8,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Plugins\**" />
+    <EmbeddedResource Remove="Plugins\**" />
+    <None Remove="Plugins\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ConversationSummarySkill\SummarizeConversation\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ConversationSummarySkill\SummarizeConversation\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\OrchestratorSkill\GetIntent\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\OrchestratorSkill\GetIntent\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\OrchestratorSkill\GetNumbers\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\OrchestratorSkill\GetNumbers\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\RAGSkill\Search\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\RAGSkill\Search\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Notegen\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Notegen\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Summarize\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Summarize\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Topics\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Topics\skprompt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AISmarteasy.Core.Function\AISmarteasy.Core.Function\AISmarteasy.Core.Function.csproj" />
     <ProjectReference Include="..\AISmarteasy.Core.Worker\AISmarteasy.Core.Worker.csproj" />
   </ItemGroup>
 

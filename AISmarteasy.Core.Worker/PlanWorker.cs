@@ -1,6 +1,4 @@
-﻿using AISmarteasy.Service.OpenAI;
-
-namespace AISmarteasy.Core.Worker;
+﻿namespace AISmarteasy.Core.Worker;
 
 public class PlanWorker : LLMWorker
 {

@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AISmarteasy.Service", "..\A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AISmarteasy.Core", "..\AISmarteasy.Core\AISmarteasy.Core\AISmarteasy.Core.csproj", "{F845D317-AED7-4305-BFBC-1A02A00E4B43}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AISmarteasy.Core.Function", "..\AISmarteasy.Core.Function\AISmarteasy.Core.Function\AISmarteasy.Core.Function.csproj", "{3B1A437D-C1B3-47E7-9368-33CD0C25A704}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AISmarteasy.Core.Prompt", "..\AISmarteasy.Core.Prompt\AISmarteasy.Core.Prompt\AISmarteasy.Core.Prompt.csproj", "{B930831C-E3A5-4EFE-8F82-1E521D319626}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{F845D317-AED7-4305-BFBC-1A02A00E4B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F845D317-AED7-4305-BFBC-1A02A00E4B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F845D317-AED7-4305-BFBC-1A02A00E4B43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B1A437D-C1B3-47E7-9368-33CD0C25A704}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1A437D-C1B3-47E7-9368-33CD0C25A704}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B1A437D-C1B3-47E7-9368-33CD0C25A704}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B1A437D-C1B3-47E7-9368-33CD0C25A704}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B930831C-E3A5-4EFE-8F82-1E521D319626}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B930831C-E3A5-4EFE-8F82-1E521D319626}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B930831C-E3A5-4EFE-8F82-1E521D319626}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B930831C-E3A5-4EFE-8F82-1E521D319626}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

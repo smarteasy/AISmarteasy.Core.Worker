@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace AISmarteasy.Core.Worker;
+﻿namespace AISmarteasy.Core.Worker;
 
 public struct QueryRequest(ChatHistory chatHistory, LLMServiceSetting serviceSetting, CancellationToken cancellationToken = default)
 {
