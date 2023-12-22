@@ -8,7 +8,7 @@ internal class Program
     //    private static readonly string PineconeEnvironment = Env.PineconeEnvironment;
     //    private static readonly string PineconeAPIKey = Env.PineconeAPIKey;
 
-    public static void Main(string[] args)
+    public static void Main()
     {
         //Run_InstructionWorker_Query();
         Run_InstructionWorker_Generate_Summarize();
@@ -17,7 +17,6 @@ internal class Program
 
     private static async void Run_InstructionWorker_Query()
     {
-        var workerContext = new WorkerContext(new VariableDictionary());
         var logger = NullLogger.Instance;
         var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
@@ -39,7 +38,6 @@ internal class Program
 
     private static async void Run_InstructionWorker_Generate_Summarize()
     {
-        var workerContext = new WorkerContext(new VariableDictionary());
         var logger = NullLogger.Instance;
         var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
