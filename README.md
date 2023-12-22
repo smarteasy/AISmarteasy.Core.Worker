@@ -5,7 +5,7 @@ public static class WorkerEnv
 {
     public const string OPENAI_API_KEY = "";
 }
-
+<br>
 -----
 
 프롬프트 템플릿을 실행 경로에 추가한다.
