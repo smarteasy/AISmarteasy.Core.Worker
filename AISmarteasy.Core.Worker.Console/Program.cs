@@ -8,11 +8,40 @@ internal class Program
     //    private static readonly string PineconeEnvironment = Env.PineconeEnvironment;
     //    private static readonly string PineconeAPIKey = Env.PineconeAPIKey;
 
-    public static void Main()
+    public static async Task Main()
     {
         //Run_InstructionWorker_Query();
-        Run_InstructionWorker_Generate_Summarize();
+        //Run_InstructionWorker_Generate_Summarize();
+        await Run_InstructionWorker_Query_Chat();
         System.Console.ReadLine();
+    }
+    private static async Task Run_InstructionWorker_Query_Chat()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var chatHistory = new ChatHistory();
+
+        while (true)
+        {
+            chatHistory = await Query_Chat(worker, chatHistory);
+        }
+    }
+
+    private static async Task<ChatHistory> Query_Chat(LLMWorker worker, ChatHistory chatHistory)
+    {
+        System.Console.Write("User > ");
+        var userMessage = System.Console.ReadLine();
+        chatHistory.AddUserMessage(userMessage ?? string.Empty);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new QueryRequest(chatHistory, serviceSetting);
+
+        chatHistory = await worker.QueryAsync(request);
+        System.Console.WriteLine("Assistant > " + chatHistory.LastContent);
+
+        return chatHistory;
     }
 
     private static async void Run_InstructionWorker_Query()

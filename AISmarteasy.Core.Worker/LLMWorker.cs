@@ -10,7 +10,7 @@ public abstract class LLMWorker
     {
         WorkEnv = workEnv;
         if (workEnv.Vendor == LLMVendorTypeKind.OpenAI)
-            AIServiceConnector = new OpenAIServiceConnector(AIServiceTypeKind.TextCompletion, workEnv.ServiceAPIKey);
+            AIServiceConnector = new OpenAIServiceConnector(AIServiceTypeKind.TextCompletion, workEnv.ServiceAPIKey, workEnv.Logger);
         LLMWorkEnv.PluginStore = SemanticFunctionLoader.Load(workEnv.Logger);
     }
 
