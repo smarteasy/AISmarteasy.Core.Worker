@@ -10,11 +10,35 @@ internal class Program
 
     public static async Task Main()
     {
-        //Run_InstructionWorker_Query();
-        //Run_InstructionWorker_Generate_Summarize();
-        await Run_InstructionWorker_Query_Chat();
+        //await Run_InstructionWorker_Query();
+        //await Run_InstructionWorker_Generate_Summarize();
+        //await Run_InstructionWorker_Query_Chat();
+
+        await PrintSemanticFunctionCategory();
+
         System.Console.ReadLine();
     }
+
+    private static Task PrintSemanticFunctionCategory()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var categories = LLMWorkEnv.PluginStore!.SemanticFunctionCategories;
+        foreach (var category in categories)
+        {
+            System.Console.WriteLine(category.Name);
+
+            foreach (var subCategory in category.SubCategories)
+            {
+                System.Console.WriteLine("- " + subCategory.Name + ":" + subCategory.Content);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
     private static async Task Run_InstructionWorker_Query_Chat()
     {
         var logger = NullLogger.Instance;
