@@ -16,4 +16,9 @@ public class PlanWorker : LLMWorker
     {
         throw new NotImplementedException();
     }
+
+    public override Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request)
+    {
+        throw new NotImplementedException();
+    }
 }

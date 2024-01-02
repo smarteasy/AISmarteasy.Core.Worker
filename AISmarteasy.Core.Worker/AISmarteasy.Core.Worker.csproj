@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\AISmarteasy.Core.Function\AISmarteasy.Core.Function\AISmarteasy.Core.Function.csproj" />
     <ProjectReference Include="..\..\AISmarteasy.Service\AISmarteasy.Service\AISmarteasy.Service.csproj" />
+    <ProjectReference Include="..\..\AISmarteasy.Skill\AISmarteasy.Skill\AISmarteasy.Skill.csproj" />
   </ItemGroup>
 
 </Project>

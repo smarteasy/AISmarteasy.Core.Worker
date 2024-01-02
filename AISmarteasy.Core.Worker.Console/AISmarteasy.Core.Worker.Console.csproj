@@ -68,12 +68,14 @@
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Form\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\GitHubMemoryQuery\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\GitHubMemoryQuery\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\QNA\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\QNA\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Question\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Question\skprompt.txt" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\RAGSkill\Search\config.json" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\RAGSkill\Search\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Notegen\config.json" />
@@ -118,6 +120,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AISmarteasy.Core.Function\AISmarteasy.Core.Function\AISmarteasy.Core.Function.csproj" />
+    <ProjectReference Include="..\..\AISmarteasy.Service\AISmarteasy.Service\AISmarteasy.Service.csproj" />
+    <ProjectReference Include="..\..\AISmarteasy.Skill\AISmarteasy.Skill\AISmarteasy.Skill.csproj" />
     <ProjectReference Include="..\AISmarteasy.Core.Worker\AISmarteasy.Core.Worker.csproj" />
   </ItemGroup>
 

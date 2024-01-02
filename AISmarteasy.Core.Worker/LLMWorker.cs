@@ -1,5 +1,6 @@
 ﻿using AISmarteasy.Core.Function;
 using AISmarteasy.Service.OpenAI;
+using AISmarteasy.Skill;
 
 namespace AISmarteasy.Core.Worker;
 
@@ -11,7 +12,10 @@ public abstract class LLMWorker
         WorkEnv = workEnv;
         if (workEnv.Vendor == LLMVendorTypeKind.OpenAI)
             AIServiceConnector = new OpenAIServiceConnector(AIServiceTypeKind.TextCompletion, workEnv.ServiceAPIKey, workEnv.Logger);
-        LLMWorkEnv.PluginStore = SemanticFunctionLoader.Load(workEnv.Logger);
+        var pluginStore = SemanticFunctionLoader.Load(workEnv.Logger);
+        NativeFunctionLoader.Load(pluginStore, workEnv.Logger);
+
+        LLMWorkEnv.PluginStore = pluginStore;
     }
 
     public LLMWorkEnv WorkEnv { get; set; }
@@ -20,8 +24,5 @@ public abstract class LLMWorker
     public abstract Task<ChatHistory> QueryAsync(QueryRequest request);
     public abstract Task<ChatHistory> GenerateAsync(GenerationRequest request);
 
-    protected virtual async Task<ChatHistory> RunAsync(ChatHistory chatHistory, LLMServiceSetting requestSetting, CancellationToken cancellationToken)
-    {
-        return await AIServiceConnector!.TextCompletionAsync(chatHistory, requestSetting, cancellationToken);
-    }
+    public abstract Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request);
 }

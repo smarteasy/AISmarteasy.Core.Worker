@@ -1,22 +1,133 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+﻿using AISmarteasy.Service;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AISmarteasy.Core.Worker.Console;
 
 internal class Program
 {
     private static readonly string OpenaiAPIKey = WorkerEnv.OPENAI_API_KEY;
-    //    private static readonly string PineconeEnvironment = Env.PineconeEnvironment;
-    //    private static readonly string PineconeAPIKey = Env.PineconeAPIKey;
 
     public static async Task Main()
     {
         //await Run_InstructionWorker_Query();
         //await Run_InstructionWorker_Generate_Summarize();
         //await Run_InstructionWorker_Query_Chat();
+        //await PrintSemanticFunctionCategory();
+        //await Run_InstructionWorker_Query_Chat_RAG();
 
-        await PrintSemanticFunctionCategory();
+        //await Run_InstructionWorker_Query_Streaming();
+        //await Run_InstructionWorker_Query_Chat_RAG_Streaming();
+        //await Run_InstructionWorker_NativeFunction_TextSkill();
+        await Run_InstructionWorker_NativeFunction_TextSkill_Pipeline();
 
         System.Console.ReadLine();
+    }
+
+    public static async Task Run_InstructionWorker_NativeFunction_TextSkill()
+    {
+        System.Console.WriteLine("======== NativeFunction_TextSkill ========");
+        
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new PipelineRunRequest(serviceSetting);
+        request.AddPluginFunctionName("TextSkill", "Uppercase");
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput("ciao!");
+
+        System.Console.WriteLine("Answer: ");
+
+        var chatHistory = await worker.RunPipelineAsync(request);
+        System.Console.Write(chatHistory.PipelineLastContent);
+    }
+
+    public static async Task Run_InstructionWorker_NativeFunction_TextSkill_Pipeline()
+    {
+        System.Console.WriteLine("======== NativeFunction_TextSkill ========");
+
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new PipelineRunRequest(serviceSetting);
+        request.AddPluginFunctionName("TextSkill", "TrimStart");
+        request.AddPluginFunctionName("TextSkill", "TrimEnd");
+        request.AddPluginFunctionName("TextSkill", "Uppercase");
+
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput("    infinite space     ");
+        System.Console.WriteLine("Answer: ");
+
+        var chatHistory = await worker.RunPipelineAsync(request);
+        System.Console.Write(chatHistory.PipelineLastContent);
+    }
+
+    public static async Task Run_InstructionWorker_Query_Streaming()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var chatHistory = new ChatHistory();
+        var userMessage = "ChatGPT?";
+
+        System.Console.WriteLine("Query: " + userMessage);
+
+        chatHistory.AddUserMessage(userMessage);
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new QueryRequest(chatHistory, serviceSetting, true);
+        
+        System.Console.WriteLine("Answer: ");
+        
+        chatHistory = await worker.QueryAsync(request);
+        System.Console.Write(chatHistory.LastContent);
+    }
+
+    public static async Task Run_InstructionWorker_Query_Chat_RAG_Streaming()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var chatHistory = new ChatHistory();
+        var userMessage = "What's Ferrari stock price?";
+
+        System.Console.WriteLine("Query: " + userMessage);
+
+        chatHistory.AddUserMessage(userMessage);
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new QueryRequest(chatHistory, serviceSetting, true);
+
+        chatHistory = await worker.QueryAsync(request);
+
+        System.Console.WriteLine("=========");
+        System.Console.WriteLine("Retrieval: " + LLMWorkEnv.WorkerContext.Variables.Context);
+        System.Console.WriteLine("=========");
+        System.Console.WriteLine("Answer: " + chatHistory.LastContent);
+    }
+
+    public static async Task Run_InstructionWorker_Query_Chat_RAG()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var chatHistory = new ChatHistory();
+        var userMessage = "What's Ferrari stock price?";
+
+        System.Console.WriteLine("Query: " + userMessage);
+
+        chatHistory.AddUserMessage(userMessage);
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new QueryRequest(chatHistory, serviceSetting);
+
+        chatHistory = await worker.QueryAsync(request);
+        
+        System.Console.WriteLine("=========");
+        System.Console.WriteLine("Retrieval: " + LLMWorkEnv.WorkerContext.Variables.Context);
+        System.Console.WriteLine("=========");
+        System.Console.WriteLine("Answer: " + chatHistory.LastContent);
     }
 
     private static Task PrintSemanticFunctionCategory()
@@ -100,7 +211,7 @@ internal class Program
         var request = new GenerationRequest("SummarizeSkill", "Summarize", chatHistory, serviceSetting);
 
         var input = GetSummarizeText();
-        LLMWorkEnv.WorkerContext.Variables.Update(input);
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(input);
 
         chatHistory = await worker.GenerateAsync(request);
 
@@ -234,35 +345,6 @@ Jane: Goodbye!
     ////    }
 
 
-    ////    private static async void Run_Example01_NativeFunctions()
-    ////    {
-    ////        KernelBuilder.Build(new AIServiceConfig(AIServiceTypeKind.TextCompletion, OpenaiAPIKey));
-    ////        var kernel = KernelProvider.Kernel;
-
-    ////        var config = new FunctionRunConfig("TextSkill", "Uppercase");
-    ////        config.UpdateInput("ciao");
-    ////        await kernel!.RunFunctionAsync(config);
-
-    ////        Console.WriteLine(KernelProvider.Kernel!.ContextVariablesInput);
-    ////    }
-
-    ////    private static async void Run_Example02_Pipeline()
-    ////    {
-    ////        KernelBuilder.Build(new AIServiceConfig(AIServiceTypeKind.TextCompletion, OpenaiAPIKey));
-    ////        var kernel = KernelProvider.Kernel;
-
-    ////        var config = new PipelineRunConfig();
-
-    ////        config.AddPluginFunctionName("TextSkill", "TrimStart");
-    ////        config.AddPluginFunctionName("TextSkill", "TrimEnd");
-    ////        config.AddPluginFunctionName("TextSkill", "Uppercase");
-
-    ////        config.UpdateInput("    i n f i n i t e     s p a c e     ");
-
-    ////        var answer = await kernel!.RunPipelineAsync(config);
-    ////        Console.WriteLine(answer.Text);
-    ////    }
-
     ////    private static async void Run_Example03_Variables()
     ////    {
     ////        KernelBuilder.Build(new AIServiceConfig(AIServiceTypeKind.TextCompletion, OpenaiAPIKey));
@@ -387,38 +469,6 @@ Jane: Goodbye!
     ////        Console.WriteLine(KernelProvider.Kernel?.ContextVariablesInput);
     ////    }
 
-    ////    private static Task RunExample10_DescribeAllPluginsAndFunctions()
-    ////    {
-    ////        KernelBuilder.Build(new AIServiceConfig(AIServiceTypeKind.ChatCompletion, OpenaiAPIKey));
-    ////        var kernel = KernelProvider.Kernel;
-
-    ////        foreach (var plugin in kernel!.Plugins.Values)
-    ////        {
-    ////            foreach (var function in plugin.Functions)
-    ////            {
-    ////                PrintFunction(function.View);
-    ////            }
-    ////        }
-
-    ////        return Task.CompletedTask;
-    ////    }
-
-    ////    private static void PrintFunction(FunctionView func)
-    ////    {
-    ////        Console.WriteLine($"   {func.Name}: {func.Description}");
-
-    ////        if (func.Parameters.Count > 0)
-    ////        {
-    ////            Console.WriteLine("      Params:");
-    ////            foreach (var p in func.Parameters)
-    ////            {
-    ////                Console.WriteLine($"      - {p.Name}: {p.Description}");
-    ////                Console.WriteLine($"        default: '{p.DefaultValue}'");
-    ////            }
-    ////        }
-
-    ////        Console.WriteLine();
-    ////    }
 
     ////    private static async void Run_Example12_SequentialPlanner()
     ////    {
@@ -433,7 +483,6 @@ Jane: Goodbye!
     ////        Console.WriteLine("Answer:\n");
     ////        Console.WriteLine(plan.Answer);
     ////    }
-
 
 
     ////    private static async void Run_Example13_03_ConversationSummaryPlugin()
@@ -556,52 +605,7 @@ Jane: Goodbye!
     ////        await MessageOutputAsync(chatHistory);
     ////    }
 
-    ////    private static async void Run_Example32_StreamingCompletion()
-    ////    {
-    ////        Console.WriteLine("======== Azure OpenAI - Text Completion - Raw Streaming ========");
 
-    ////        KernelBuilder.Build(new AIServiceConfig(AIServiceTypeKind.TextCompletion, OpenaiAPIKey));
-    ////        var kernel = KernelProvider.Kernel;
-    ////        var prompt = "Write one paragraph why AI is awesome";
-
-    ////        Console.WriteLine("Prompt: " + prompt);
-    ////        await foreach (var answer in kernel!.RunTextStreamingCompletionAsync(prompt))
-    ////        {
-    ////            await foreach (var stream in answer.GetCompletionStreamingAsync())
-    ////            {
-    ////                Console.Write(stream);
-    ////            }
-    ////        }
-
-    ////        Console.WriteLine();
-    ////    }
-
-    ////    private static async void Run_Example33_StreamingChat()
-    ////    {
-    ////        Console.WriteLine("======== Open AI - ChatGPT Streaming ========");
-
-    ////        KernelBuilder.Build(new AIServiceConfig(AIServiceTypeKind.ChatCompletion, OpenaiAPIKey));
-    ////        var kernel = KernelProvider.Kernel;
-    ////        Console.WriteLine("Chat content:");
-    ////        Console.WriteLine("------------------------");
-
-    ////        var systemMessage = "You are a librarian, expert about books";
-    ////        var chatHistory = await kernel!.RunChatCompletionAsync(systemMessage);
-    ////        await MessageOutputAsync(chatHistory);
-
-    ////        chatHistory.AddUserMessage("Hi, I'm looking for book suggestions");
-    ////        await MessageOutputAsync(chatHistory);
-
-    ////        Console.Write($"{AuthorRole.Assistant}: ");
-
-    ////        await foreach (var answer in kernel.RunChatStreamingAsync(chatHistory))
-    ////        {
-    ////            await foreach (var stream in answer.GetStreamingChatMessageAsync())
-    ////            {
-    ////                Console.Write(stream.Content);
-    ////            }
-    ////        }
-    ////    }
 
     ////    private static async void Run_LanguageCalculatorPlugin()
     ////    {
@@ -774,30 +778,7 @@ Jane: Goodbye!
     //    //            Console.WriteLine(answer.Text);
     //    //        }
 
-    //    //        public static async Task RunNativeFunction()
-    //    //        {
-    //    //            var kernel = new KernelBuilder()
-    //    //                .Build(new AIServiceConfig(AIServiceTypeKind.TextCompletion, API_KEY));
 
-    //    //            var loader = new NativePluginLoader();
-    //    //            loader.Load();
-
-    //    //            var function = kernel.FindFunction("MathSkill", "Sqrt");
-    //    //            var parameters = new Dictionary<string, string> { { "input", "12" } };
-
-    //    //            var answer = await kernel.RunFunction(function, parameters);
-    //    //            Console.WriteLine(answer.Text);
-
-    //    //            parameters = new Dictionary<string, string>
-    //    //            {
-    //    //                { "input", "12.34" },
-    //    //                { "number", "56.78" }
-    //    //            };
-
-    //    //            function = kernel.FindFunction("MathSkill", "Multiply");
-    //    //            answer = await kernel.RunFunction(function, parameters);
-    //    //            Console.WriteLine(answer.Text);
-    //    //        }
 
     //    //        public static async Task TimeSkillNow()
     //    //        {

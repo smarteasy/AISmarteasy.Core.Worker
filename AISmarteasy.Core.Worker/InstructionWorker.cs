@@ -1,15 +1,43 @@
 ﻿namespace AISmarteasy.Core.Worker;
 
-public class InstructionWorker : LLMWorker
+public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
 {
-    public InstructionWorker(LLMWorkEnv workEnv)
-        : base(workEnv)
-    {
-    }
-
     public override async Task<ChatHistory> QueryAsync(QueryRequest request)
     {
-        return await RunAsync(request.ChatHistory, request.ServiceSetting, request.CancellationToken);
+        var queryFunction = LLMWorkEnv.PluginStore!.FindFunction("QuerySkill", "Default");
+        Verifier.NotNull(queryFunction);
+
+        var question = request.ChatHistory.LastContent;
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(question);
+        var chatHistory = await queryFunction.RunAsync(AIServiceConnector!, request.ServiceSetting);
+
+        if (chatHistory.LastContent.Contains("google.search", StringComparison.OrdinalIgnoreCase))
+        {
+            var searchFunction = LLMWorkEnv.PluginStore.FindFunction("GoogleSkill", "Search");
+            await searchFunction!.RunAsync(AIServiceConnector!, request.ServiceSetting);
+
+            LLMWorkEnv.WorkerContext.Variables.UpdateContext(LLMWorkEnv.WorkerContext.Result);
+        }
+
+        var function = LLMWorkEnv.PluginStore.FindFunction("QuerySkill", "WithSearch");
+        Verifier.NotNull(function);
+
+        if (request.IsWithStreaming)
+        {
+            var answer = string.Empty;
+            await foreach (var answerStreaming in function.RunStreamingAsync(AIServiceConnector!, request.ServiceSetting))
+            {
+                answer += answerStreaming.Content;
+            }
+
+            chatHistory.AddAssistantMessage(answer);
+        }
+        else
+        {
+            chatHistory = await function.RunAsync(AIServiceConnector!, request.ServiceSetting);
+        }
+
+        return chatHistory;
     }
 
     public override async Task<ChatHistory> GenerateAsync(GenerationRequest request)
@@ -20,29 +48,21 @@ public class InstructionWorker : LLMWorker
         return await function.RunAsync(AIServiceConnector!, request.ServiceSetting);
     }
 
-    //public Task RunFunctionAsync(FunctionRunConfig config)
-    //{
-    //    var function = FindFunction(config.PluginName, config.FunctionName);
-    //    return RunFunctionAsync(function, config.Parameters);
-    //}
+    public override async Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request)
+    {
+        var chatHistory = new ChatHistory();
 
-    //public Task RunFunctionAsync(Function function, string prompt)
-    //{
-    //    var config = new FunctionRunConfig();
-    //    config.UpdateInput(prompt);
-    //    return RunFunctionAsync(function, config.Parameters);
-    //}
+        foreach (var pluginFunctionName in request.PluginFunctionNames)
+        {
+            var function = LLMWorkEnv.PluginStore!.FindFunction(pluginFunctionName.PluginName, pluginFunctionName.FunctionName);
 
-    //public Task RunFunctionAsync(Function function, Dictionary<string, string>? parameters = default)
-    //{
-    //    if (parameters != null)
-    //    {
-    //        foreach (var parameter in parameters)
-    //        {
-    //            Context.Variables[parameter.Key] = parameter.Value;
-    //        }
-    //    }
+            Verifier.NotNull(function);
+            chatHistory = await function.RunAsync(AIServiceConnector!, request.ServiceSetting);
+            LLMWorkEnv.WorkerContext.Variables.UpdateInput(chatHistory.PipelineLastContent);
+        }
 
-    //    return function.RunAsync(function.RequestSettings);
-    //}
+        request.Parameters.Clear();
+
+        return chatHistory;
+    }
 }
