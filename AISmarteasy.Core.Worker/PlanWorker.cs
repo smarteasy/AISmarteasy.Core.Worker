@@ -1,4 +1,6 @@
-﻿namespace AISmarteasy.Core.Worker;
+﻿using Azure.Core;
+
+namespace AISmarteasy.Core.Worker;
 
 public class PlanWorker : LLMWorker
 {
@@ -18,6 +20,16 @@ public class PlanWorker : LLMWorker
     }
 
     public override Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task RunTextToSpeechAsync(TextToSpeechRunRequest request)
     {
         throw new NotImplementedException();
     }

@@ -11,7 +11,7 @@ public abstract class LLMWorker
     {
         WorkEnv = workEnv;
         if (workEnv.Vendor == LLMVendorTypeKind.OpenAI)
-            AIServiceConnector = new OpenAIServiceConnector(AIServiceTypeKind.TextCompletion, workEnv.ServiceAPIKey, workEnv.Logger);
+            AIServiceConnector = new OpenAIServiceConnector(workEnv.AIServiceType, workEnv.ServiceAPIKey, workEnv.Logger);
         var pluginStore = SemanticFunctionLoader.Load(workEnv.Logger);
         NativeFunctionLoader.Load(pluginStore, workEnv.Logger);
 
@@ -25,4 +25,8 @@ public abstract class LLMWorker
     public abstract Task<ChatHistory> GenerateAsync(GenerationRequest request);
 
     public abstract Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request);
+
+    public abstract Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request);
+
+    public abstract Task RunTextToSpeechAsync(TextToSpeechRunRequest request);
 }

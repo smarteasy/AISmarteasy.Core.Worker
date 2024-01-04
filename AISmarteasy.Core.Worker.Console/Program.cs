@@ -1,4 +1,5 @@
 ﻿using AISmarteasy.Service;
+using AISmarteasy.Service.OpenAI;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AISmarteasy.Core.Worker.Console;
@@ -18,9 +19,111 @@ internal class Program
         //await Run_InstructionWorker_Query_Streaming();
         //await Run_InstructionWorker_Query_Chat_RAG_Streaming();
         //await Run_InstructionWorker_NativeFunction_TextSkill();
-        await Run_InstructionWorker_NativeFunction_TextSkill_Pipeline();
+        //await Run_InstructionWorker_NativeFunction_TextSkill_Pipeline();
+
+        //await Run_InstructionWorker_AudioTranscription();
+        //await Run_InstructionWorker_AudioTranscription_Ko();
+
+        await Run_InstructionWorker_TextToSpeech_SaveFile();
+
 
         System.Console.ReadLine();
+    }
+
+    public static async Task Run_InstructionWorker_TextToSpeech_SaveFile()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextToSpeechSpeed, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var filepath = "./speech.mp3";
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput("안녕하세요. 반갑습니다. 저는 뉴테크프라임 김현남입니다.");
+        var request = new TextToSpeechRunRequest(filepath, OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Alloy));
+        await worker.RunTextToSpeechAsync(request);
+
+        System.Console.WriteLine("TTS 완료.");
+    }
+
+    public static async Task Run_InstructionWorker_AudioTranscription_Ko()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var filepath = "./L1.mp3";
+
+        var trimmedAudioFiles = AudioTranscriptionHelper.TrimSilence(filepath);
+        var request = new SpeechToTextRunRequest(trimmedAudioFiles, "ko");
+        
+        var audioTranscription = await worker.RunSpeechToTextAsync(request);
+        System.Console.WriteLine(audioTranscription);
+    }
+
+    public static async Task Run_InstructionWorker_AudioTranscription_Ko_Correct()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+
+        var filepath = "./L1.mp3";
+        var trimmedAudioFiles = AudioTranscriptionHelper.TrimSilence(filepath);
+        var transcriptionRunRequest = new SpeechToTextRunRequest(trimmedAudioFiles, "ko");
+
+        var audioTranscription = await worker.RunSpeechToTextAsync(transcriptionRunRequest);
+        System.Console.WriteLine(audioTranscription);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new PipelineRunRequest(serviceSetting);
+        request.AddPluginFunctionName("AudioSkill", "CorrectKoreanTranscription");
+        LLMWorkEnv.WorkerContext.Variables["CorrectlySpelledWords"] = "생성AI";
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(audioTranscription);
+        var chatHistory = await worker.RunPipelineAsync(request);
+        System.Console.WriteLine("Correct AudioTranscription:");
+        System.Console.WriteLine(chatHistory.PipelineLastContent);
+    }
+
+    public static async Task Run_InstructionWorker_AudioTranscription_Correct()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var earningsCallUrl = "https://cdn.openai.com/API/examples/data/EarningsCall.wav";
+        var earningsCallFilepath = "./EarningsCall.wav";
+
+        await AudioTranscriptionHelper.DownloadAudioFile(earningsCallUrl, earningsCallFilepath);
+        var trimmedAudioFiles = AudioTranscriptionHelper.TrimSilence(earningsCallFilepath);
+
+        var transcriptionRunRequest = new SpeechToTextRunRequest(trimmedAudioFiles);
+        var audioTranscription = await worker.RunSpeechToTextAsync(transcriptionRunRequest);
+        System.Console.WriteLine("AudioTranscription:" + audioTranscription);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new PipelineRunRequest(serviceSetting);
+        request.AddPluginFunctionName("AudioSkill", "CorrectTranscription");
+        LLMWorkEnv.WorkerContext.Variables["CompanyName"] = "NewTechPrime";
+        LLMWorkEnv.WorkerContext.Variables["CorrectlySpelledWords"] = "UML";
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(audioTranscription);
+        var chatHistory = await worker.RunPipelineAsync(request);
+        System.Console.WriteLine("Correct AudioTranscription:" + chatHistory.PipelineLastContent);
+    }
+
+    public static async Task Run_InstructionWorker_AudioTranscription()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var earningsCallUrl = "https://cdn.openai.com/API/examples/data/EarningsCall.wav";
+        var earningsCallFilepath = "./EarningsCall.wav";
+
+        await AudioTranscriptionHelper.DownloadAudioFile(earningsCallUrl, earningsCallFilepath);
+        var trimmedAudioFiles = AudioTranscriptionHelper.TrimSilence(earningsCallFilepath);
+
+        var request = new SpeechToTextRunRequest(trimmedAudioFiles);
+        var audioTranscription = await worker.RunSpeechToTextAsync(request);
+        System.Console.WriteLine(audioTranscription);
     }
 
     public static async Task Run_InstructionWorker_NativeFunction_TextSkill()
@@ -28,7 +131,7 @@ internal class Program
         System.Console.WriteLine("======== NativeFunction_TextSkill ========");
         
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
@@ -47,7 +150,7 @@ internal class Program
         System.Console.WriteLine("======== NativeFunction_TextSkill ========");
 
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
@@ -66,7 +169,7 @@ internal class Program
     public static async Task Run_InstructionWorker_Query_Streaming()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var chatHistory = new ChatHistory();
@@ -87,7 +190,7 @@ internal class Program
     public static async Task Run_InstructionWorker_Query_Chat_RAG_Streaming()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var chatHistory = new ChatHistory();
@@ -110,7 +213,7 @@ internal class Program
     public static async Task Run_InstructionWorker_Query_Chat_RAG()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var chatHistory = new ChatHistory();
@@ -133,7 +236,7 @@ internal class Program
     private static Task PrintSemanticFunctionCategory()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var categories = LLMWorkEnv.PluginStore!.SemanticFunctionCategories;
@@ -153,7 +256,7 @@ internal class Program
     private static async Task Run_InstructionWorker_Query_Chat()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var chatHistory = new ChatHistory();
@@ -182,7 +285,7 @@ internal class Program
     private static async void Run_InstructionWorker_Query()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var systemMessage = "You are a librarian, expert about books";
@@ -203,7 +306,7 @@ internal class Program
     private static async void Run_InstructionWorker_Generate_Summarize()
     {
         var logger = NullLogger.Instance;
-        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var chatHistory = new ChatHistory();

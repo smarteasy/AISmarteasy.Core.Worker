@@ -65,4 +65,14 @@ public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
 
         return chatHistory;
     }
+
+    public override async Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request)
+    {
+        return await AIServiceConnector!.SpeechToTextAsync(request.AudioFilePaths, request.Language);
+    }
+
+    public override Task RunTextToSpeechAsync(TextToSpeechRunRequest request)
+    { 
+        return AIServiceConnector!.TextToSpeechAsync(request);
+    }
 }
