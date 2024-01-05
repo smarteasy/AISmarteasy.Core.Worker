@@ -26,12 +26,12 @@ internal class Program
         //await Run_InstructionWorker_AudioTranscription_Ko();
         //await Run_InstructionWorker_AudioTranscription_Ko_Correct();
 
-        //await Run_InstructionWorker_TextToSpeech_SaveFile();
+        await Run_InstructionWorker_TextToSpeech_SaveFile();
 
         //var filepath = "./speech.mp3";
         //PlayTextToSpeechFile(filepath);
 
-        await Run_InstructionWorker_TextToSpeech_Stream();
+        //await Run_InstructionWorker_TextToSpeech_Stream();
 
 
         System.Console.ReadLine();
@@ -86,7 +86,9 @@ internal class Program
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var filepath = "./speech.mp3";
-        LLMWorkEnv.WorkerContext.Variables.UpdateInput("안녕하세요. 반갑습니다. 저는 뉴테크프라임 김현남입니다.");
+        var text = "안녕하세요. 반갑습니다. 저는 뉴테크프라임 대표 컨설턴트 김현남입니다. " + GetTtsText();
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(text);
+        System.Console.WriteLine(text);
         var request = new TextToSpeechRunRequest(filepath, OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Alloy));
         await worker.RunTextToSpeechAsync(request);
 
@@ -99,7 +101,7 @@ internal class Program
         var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
-        var filepath = "./L1.mp3";
+        var filepath = "./kmk.mp3";
 
         var trimmedAudioFiles = AudioTranscriptionHelper.TrimSilence(filepath);
         var request = new SpeechToTextRunRequest(trimmedAudioFiles, "ko");
