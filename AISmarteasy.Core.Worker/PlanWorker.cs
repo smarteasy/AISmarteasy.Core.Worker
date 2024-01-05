@@ -33,4 +33,9 @@ public class PlanWorker : LLMWorker
     {
         throw new NotImplementedException();
     }
+
+    public override Task<Stream> RunTextToSpeechStreamAsync(TextToSpeechRunRequest request)
+    {
+        throw new NotImplementedException();
+    }
 }

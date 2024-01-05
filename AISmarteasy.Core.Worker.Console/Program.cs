@@ -1,6 +1,7 @@
 ﻿using AISmarteasy.Service;
 using AISmarteasy.Service.OpenAI;
 using Microsoft.Extensions.Logging.Abstractions;
+using NAudio.Wave;
 
 namespace AISmarteasy.Core.Worker.Console;
 
@@ -23,17 +24,65 @@ internal class Program
 
         //await Run_InstructionWorker_AudioTranscription();
         //await Run_InstructionWorker_AudioTranscription_Ko();
+        //await Run_InstructionWorker_AudioTranscription_Ko_Correct();
 
-        await Run_InstructionWorker_TextToSpeech_SaveFile();
+        //await Run_InstructionWorker_TextToSpeech_SaveFile();
+
+        //var filepath = "./speech.mp3";
+        //PlayTextToSpeechFile(filepath);
+
+        await Run_InstructionWorker_TextToSpeech_Stream();
 
 
         System.Console.ReadLine();
     }
 
-    public static async Task Run_InstructionWorker_TextToSpeech_SaveFile()
+    public static async Task Run_InstructionWorker_TextToSpeech_Stream()
     {
         var logger = NullLogger.Instance;
         var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextToSpeechSpeed, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var text = "안녕하세요. 반갑습니다. 저는 뉴테크프라임 대표 컨설턴트 김현남입니다. "  + GetTtsText();
+
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(text);
+        System.Console.WriteLine(text);
+        var request = new TextToSpeechRunRequest(OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Alloy));
+
+        await using var stream = await worker.RunTextToSpeechStreamAsync(request);
+        PlayTextToSpeechStream(stream);
+
+        System.Console.WriteLine("TTS 완료.");
+    }
+
+    private static void PlayTextToSpeechFile(string filepath)
+    {
+        using var mf = new MediaFoundationReader(filepath);
+        using var wo = new WaveOutEvent();
+        wo.Init(mf);
+        wo.Play();
+        while (wo.PlaybackState == PlaybackState.Playing)
+        {
+            Thread.Sleep(1000);
+        }
+    }
+
+    private static void PlayTextToSpeechStream(Stream stream)
+    {
+        using var mf = new StreamMediaFoundationReader(stream);
+        using var wo = new WaveOutEvent();
+        wo.Init(mf);
+        wo.Play();
+        while (wo.PlaybackState == PlaybackState.Playing)
+        {
+            Thread.Sleep(1000);
+        }
+    }
+
+    public static async Task Run_InstructionWorker_TextToSpeech_SaveFile()
+    {
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextToSpeechQuality, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
         var filepath = "./speech.mp3";
@@ -65,14 +114,17 @@ internal class Program
         var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.SpeechToText, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
         var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
 
-
-        var filepath = "./L1.mp3";
+        var filepath = "./kmk.mp3";
         var trimmedAudioFiles = AudioTranscriptionHelper.TrimSilence(filepath);
         var transcriptionRunRequest = new SpeechToTextRunRequest(trimmedAudioFiles, "ko");
 
         var audioTranscription = await worker.RunSpeechToTextAsync(transcriptionRunRequest);
         System.Console.WriteLine(audioTranscription);
 
+
+        workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+        
         var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
         var request = new PipelineRunRequest(serviceSetting);
         request.AddPluginFunctionName("AudioSkill", "CorrectKoreanTranscription");
@@ -430,6 +482,18 @@ Jane: WE MADE IT! It's long enough. Thank you!
 John: You're welcome. I'm glad we could help. Goodbye!
 Jane: Goodbye!
 ";
+        return result;
+    }
+
+    private static string GetTtsText()
+    {
+        string result =
+            @"
+안녕하십니까, 시민 여러분. 이 무대는 박물관입니다. 정확히 말씀드리자면 구석기 시대 유물 전시실이지요. 박물관의 전속 실내 장식가는 보시는 바 이렇게 꾸며 놓았습니다. 
+기둥은 구름으로 만들었고, 벽은 공기, 문은 바람으로, 천정은 햇빛, 모두 그 옛날의 재료를 썼다고 합니다. 
+여기, 같은 재료로 만든 의자가 무대 한 가운데 놓여 있고, 출입구는 좌우 양측에, 진열장은 벽면을 차지했습니다. 
+돌로 만든 그릇, 도끼, 장신구 등 옛 석기 시대 물건들이 이 진열장 속에 가지런히 놓여져 있지요. 
+        ";
         return result;
     }
 

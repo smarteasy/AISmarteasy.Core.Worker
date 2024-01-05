@@ -29,4 +29,5 @@ public abstract class LLMWorker
     public abstract Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request);
 
     public abstract Task RunTextToSpeechAsync(TextToSpeechRunRequest request);
+    public abstract Task<Stream> RunTextToSpeechStreamAsync(TextToSpeechRunRequest request);
 }

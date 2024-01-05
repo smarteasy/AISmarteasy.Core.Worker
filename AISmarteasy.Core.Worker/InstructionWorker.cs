@@ -75,4 +75,9 @@ public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
     { 
         return AIServiceConnector!.TextToSpeechAsync(request);
     }
+
+    public override Task<Stream> RunTextToSpeechStreamAsync(TextToSpeechRunRequest request)
+    {
+        return AIServiceConnector!.TextToSpeechStreamAsync(request);
+    }
 }
