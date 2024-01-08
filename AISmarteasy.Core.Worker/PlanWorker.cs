@@ -1,23 +1,32 @@
-﻿using Azure.Core;
+﻿namespace AISmarteasy.Core.Worker;
 
-namespace AISmarteasy.Core.Worker;
-
-public class PlanWorker : LLMWorker
+public class PlanWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
 {
-    public PlanWorker(LLMWorkEnv workEnv) :
-        base(workEnv)
-    {
-    }
-
     public override Task<ChatHistory> QueryAsync(QueryRequest request)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<ChatHistory> GenerateAsync(GenerationRequest request)
+    public override Task<ChatHistory> GenerateTextAsync(TextGenerationRequest request)
     {
         throw new NotImplementedException();
     }
+
+    public override Task GenerateAudioAsync(AudioGenerationRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<Stream> GenerateAudioStreamAsync(AudioGenerationRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<string> GenerateImageAsync(ImageGenerationRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
 
     public override Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request)
     {
@@ -25,16 +34,6 @@ public class PlanWorker : LLMWorker
     }
 
     public override Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override Task RunTextToSpeechAsync(TextToSpeechRunRequest request)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override Task<Stream> RunTextToSpeechStreamAsync(TextToSpeechRunRequest request)
     {
         throw new NotImplementedException();
     }

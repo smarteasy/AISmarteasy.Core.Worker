@@ -19,15 +19,16 @@ public abstract class LLMWorker
     }
 
     public LLMWorkEnv WorkEnv { get; set; }
-    public AIServiceConnector? AIServiceConnector { get; set; }
+    public IAIServiceConnector? AIServiceConnector { get; set; }
 
     public abstract Task<ChatHistory> QueryAsync(QueryRequest request);
-    public abstract Task<ChatHistory> GenerateAsync(GenerationRequest request);
 
-    public abstract Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request);
+    public abstract Task<ChatHistory> GenerateTextAsync(TextGenerationRequest request);
+    public abstract Task GenerateAudioAsync(AudioGenerationRequest request);
+    public abstract Task<Stream> GenerateAudioStreamAsync(AudioGenerationRequest request);
+    public abstract Task<string> GenerateImageAsync(ImageGenerationRequest request);
+
 
     public abstract Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request);
-
-    public abstract Task RunTextToSpeechAsync(TextToSpeechRunRequest request);
-    public abstract Task<Stream> RunTextToSpeechStreamAsync(TextToSpeechRunRequest request);
+    public abstract Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request);
 }

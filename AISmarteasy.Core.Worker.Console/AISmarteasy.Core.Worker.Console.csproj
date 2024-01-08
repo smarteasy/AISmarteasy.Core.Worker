@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ImageSkill\GenerateDescription\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ImageSkill\GenerateDescription\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectKoreanTranscription\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectKoreanTranscription\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectTranscription\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectTranscription\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\CalendarSkill\AssistantShowCalendarEvents\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\CalendarSkill\AssistantShowCalendarEvents\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\ChatSkill\ChatFilter\config.json" />

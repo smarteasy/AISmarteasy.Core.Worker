@@ -40,13 +40,32 @@ public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
         return chatHistory;
     }
 
-    public override async Task<ChatHistory> GenerateAsync(GenerationRequest request)
+    public override async Task<ChatHistory> GenerateTextAsync(TextGenerationRequest request)
     {
         var function = LLMWorkEnv.PluginStore!.FindFunction(request.PluginName, request.FunctionName);
-        
         Verifier.NotNull(function);
+
+        var userMessage = request.ChatHistory.LastContent;
+        LLMWorkEnv.WorkerContext.Variables.UpdateInput(userMessage);
+
         return await function.RunAsync(AIServiceConnector!, request.ServiceSetting);
     }
+
+    public override Task GenerateAudioAsync(AudioGenerationRequest request)
+    {
+        return AIServiceConnector!.GenerateAudioAsync(request);
+    }
+
+    public override Task<Stream> GenerateAudioStreamAsync(AudioGenerationRequest request)
+    {
+        return AIServiceConnector!.GenerateAudioStreamAsync(request);
+    }
+
+    public override Task<string> GenerateImageAsync(ImageGenerationRequest request)
+    {
+        return AIServiceConnector!.GenerateImageAsync(request);
+    }
+
 
     public override async Task<ChatHistory> RunPipelineAsync(PipelineRunRequest request)
     {
@@ -68,16 +87,6 @@ public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
 
     public override async Task<string> RunSpeechToTextAsync(SpeechToTextRunRequest request)
     {
-        return await AIServiceConnector!.SpeechToTextAsync(request.AudioFilePaths, request.Language);
-    }
-
-    public override Task RunTextToSpeechAsync(TextToSpeechRunRequest request)
-    { 
-        return AIServiceConnector!.TextToSpeechAsync(request);
-    }
-
-    public override Task<Stream> RunTextToSpeechStreamAsync(TextToSpeechRunRequest request)
-    {
-        return AIServiceConnector!.TextToSpeechStreamAsync(request);
+        return await AIServiceConnector!.RunSpeechToTextAsync(request);
     }
 }

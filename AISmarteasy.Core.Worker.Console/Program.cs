@@ -1,7 +1,9 @@
-﻿using AISmarteasy.Service;
+﻿using System.Text;
+using AISmarteasy.Service;
 using AISmarteasy.Service.OpenAI;
 using Microsoft.Extensions.Logging.Abstractions;
 using NAudio.Wave;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AISmarteasy.Core.Worker.Console;
 
@@ -26,15 +28,65 @@ internal class Program
         //await Run_InstructionWorker_AudioTranscription_Ko();
         //await Run_InstructionWorker_AudioTranscription_Ko_Correct();
 
-        await Run_InstructionWorker_TextToSpeech_SaveFile();
+        //await Run_InstructionWorker_TextToSpeech_SaveFile();
 
         //var filepath = "./speech.mp3";
         //PlayTextToSpeechFile(filepath);
 
         //await Run_InstructionWorker_TextToSpeech_Stream();
 
+        //var imageDescription = "A cute baby sea otter";
+        //await Run_InstructionWorker_GenerateImage(imageDescription);
+
+        await Run_InstructionWorker_GenerateImage_UsingChat();
+
 
         System.Console.ReadLine();
+    }
+
+    public static async Task<string> Run_InstructionWorker_GenerateImage(string imageDescription)
+    {
+        System.Console.WriteLine("======== Generating Image ========");
+
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.ImageGeneration, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new ImageGenerationRequest(imageDescription, 1024, 1024);
+
+        var image = await worker.GenerateImageAsync(request);
+
+        System.Console.WriteLine(imageDescription);
+        System.Console.WriteLine("Image URL: " + image);
+
+        System.Console.WriteLine("이미지 생성 완료.");
+        
+        return image;
+    }
+
+    public static async Task Run_InstructionWorker_GenerateImage_UsingChat()
+    {
+        System.Console.WriteLine("======== Generating Image UsingChat ========");
+
+        var logger = NullLogger.Instance;
+        var workEnv = new LLMWorkEnv(LLMVendorTypeKind.OpenAI, AIServiceTypeKind.TextCompletion, OpenaiAPIKey, LLMWorkTypeKind.Instruction, logger);
+        var worker = LLMWorkerBuilder.BuildInstructionWorker(workEnv);
+
+        var chatHistory = new ChatHistory();
+
+        var userMessage = "An ink sketch style illustration of a small hedgehog holding a piece of watermelon with its tiny paws, taking little bites with its eyes closed in delight.";
+
+
+        chatHistory.AddUserMessage(userMessage);
+        System.Console.WriteLine("User: " + userMessage);
+
+        var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
+        var request = new TextGenerationRequest("ImageSkill", "GenerateDescription", chatHistory, serviceSetting);
+
+        System.Console.WriteLine("Bot: ");
+        chatHistory = await worker.GenerateTextAsync(request);
+        var image = await Run_InstructionWorker_GenerateImage(chatHistory.LastContent);
     }
 
     public static async Task Run_InstructionWorker_TextToSpeech_Stream()
@@ -47,9 +99,9 @@ internal class Program
 
         LLMWorkEnv.WorkerContext.Variables.UpdateInput(text);
         System.Console.WriteLine(text);
-        var request = new TextToSpeechRunRequest(OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Alloy));
+        var request = new AudioGenerationRequest(OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Alloy));
 
-        await using var stream = await worker.RunTextToSpeechStreamAsync(request);
+        await using var stream = await worker.GenerateAudioStreamAsync(request);
         PlayTextToSpeechStream(stream);
 
         System.Console.WriteLine("TTS 완료.");
@@ -89,8 +141,8 @@ internal class Program
         var text = "안녕하세요. 반갑습니다. 저는 뉴테크프라임 대표 컨설턴트 김현남입니다. " + GetTtsText();
         LLMWorkEnv.WorkerContext.Variables.UpdateInput(text);
         System.Console.WriteLine(text);
-        var request = new TextToSpeechRunRequest(filepath, OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Alloy));
-        await worker.RunTextToSpeechAsync(request);
+        var request = new AudioGenerationRequest(filepath, OpenAIConfigProvider.ProvideTtsVoice(TtsVoiceKind.Onyx));
+        await worker.GenerateAudioAsync(request);
 
         System.Console.WriteLine("TTS 완료.");
     }
@@ -365,12 +417,12 @@ internal class Program
 
         var chatHistory = new ChatHistory();
         var serviceSetting = LLMServiceSettingBuilder.Build(LLMRequestLevelKind.Middle);
-        var request = new GenerationRequest("SummarizeSkill", "Summarize", chatHistory, serviceSetting);
+        var request = new TextGenerationRequest("SummarizeSkill", "Summarize", chatHistory, serviceSetting);
 
         var input = GetSummarizeText();
         LLMWorkEnv.WorkerContext.Variables.UpdateInput(input);
 
-        chatHistory = await worker.GenerateAsync(request);
+        chatHistory = await worker.GenerateTextAsync(request);
 
         System.Console.WriteLine(chatHistory.LastContent);
     }
