@@ -1,9 +1,7 @@
-﻿using System.Text;
-using AISmarteasy.Service;
+﻿using AISmarteasy.Service;
 using AISmarteasy.Service.OpenAI;
 using Microsoft.Extensions.Logging.Abstractions;
 using NAudio.Wave;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AISmarteasy.Core.Worker.Console;
 
