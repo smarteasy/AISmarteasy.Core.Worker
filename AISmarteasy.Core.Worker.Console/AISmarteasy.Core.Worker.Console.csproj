@@ -14,8 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ImageSkill\GenerateDescription\config.json" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ImageSkill\GenerateDescription\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectKoreanTranscription\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectKoreanTranscription\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\AudioSkill\CorrectTranscription\config.json" />
@@ -60,8 +58,12 @@
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\GroundingPlugin\ExtractEntities\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\GroundingPlugin\ReferenceCheckEntities\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\GroundingPlugin\ReferenceCheckEntities\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ImageSkill\GenerateDescription\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\ImageSkill\GenerateDescription\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\IntentDetectionPlugin\AssistantIntent\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\IntentDetectionPlugin\AssistantIntent\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\MathSkill\TranslateToNCalc\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\MathSkill\TranslateToNCalc\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\MiscPlugin\Continue\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\MiscPlugin\Continue\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\MiscPlugin\ElementAtIndex\config.json" />
@@ -74,14 +76,14 @@
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Form\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\GitHubMemoryQuery\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\GitHubMemoryQuery\skprompt.txt" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\config.json" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\QNA\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\QNA\skprompt.txt" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\config.json" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Question\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Question\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Notegen\config.json" />
@@ -90,6 +92,8 @@
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Summarize\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Topics\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Topics\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\TwoSentenceSummary\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\TwoSentenceSummary\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\WriterSkill\AcronymGenerator\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\WriterSkill\AcronymGenerator\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\WriterSkill\AcronymReverse\config.json" />
@@ -120,8 +124,6 @@
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\WriterSkill\TellMeMore\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\WriterSkill\Translate\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\WriterSkill\Translate\skprompt.txt" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\TwoSentenceSummary\config.json" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\TwoSentenceSummary\skprompt.txt" />
   </ItemGroup>
 
   <ItemGroup>

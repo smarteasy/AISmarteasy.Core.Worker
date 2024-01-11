@@ -4,7 +4,7 @@ using AISmarteasy.Skill;
 
 namespace AISmarteasy.Core.Worker;
 
-public abstract class LLMWorker
+public abstract class LLMWorker 
 {
 
     protected LLMWorker(LLMWorkEnv workEnv)

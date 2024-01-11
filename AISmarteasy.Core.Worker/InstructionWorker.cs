@@ -1,4 +1,6 @@
-﻿namespace AISmarteasy.Core.Worker;
+﻿using Azure.Core;
+
+namespace AISmarteasy.Core.Worker;
 
 public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
 {
@@ -13,31 +15,37 @@ public class InstructionWorker(LLMWorkEnv workEnv) : LLMWorker(workEnv)
 
         if (chatHistory.LastContent.Contains("google.search", StringComparison.OrdinalIgnoreCase))
         {
-            var searchFunction = LLMWorkEnv.PluginStore.FindFunction("GoogleSkill", "Search");
-            await searchFunction!.RunAsync(AIServiceConnector!, request.ServiceSetting);
-
-            LLMWorkEnv.WorkerContext.Variables.UpdateContext(LLMWorkEnv.WorkerContext.Result);
-        }
-
-        var function = LLMWorkEnv.PluginStore.FindFunction("QuerySkill", "WithSearch");
-        Verifier.NotNull(function);
-
-        if (request.IsWithStreaming)
-        {
-            var answer = string.Empty;
-            await foreach (var answerStreaming in function.RunStreamingAsync(AIServiceConnector!, request.ServiceSetting))
-            {
-                answer += answerStreaming.Content;
-            }
-
-            chatHistory.AddAssistantMessage(answer);
-        }
-        else
-        {
-            chatHistory = await function.RunAsync(AIServiceConnector!, request.ServiceSetting);
+            chatHistory = await QueryWithGoogleSearch(request, chatHistory);
         }
 
         return chatHistory;
+    }
+
+    private async Task<ChatHistory> QueryWithGoogleSearch(QueryRequest request, ChatHistory chatHistory)
+    {
+            var searchFunction = LLMWorkEnv.PluginStore!.FindFunction("GoogleSkill", "Search");
+            var searchResult = await searchFunction!.RunAsync(AIServiceConnector!, request.ServiceSetting);
+            LLMWorkEnv.WorkerContext.Variables.UpdateContext(searchResult.PipelineLastContent);
+
+            var function = LLMWorkEnv.PluginStore.FindFunction("QuerySkill", "WithSearch");
+            Verifier.NotNull(function);
+
+            if (request.IsWithStreaming)
+            {
+                var answer = string.Empty;
+                await foreach (var answerStreaming in function.RunStreamingAsync(AIServiceConnector!, request.ServiceSetting))
+                {
+                    answer += answerStreaming.Content;
+                }
+
+                chatHistory.AddAssistantMessage(answer);
+            }
+            else
+            {
+                chatHistory = await function.RunAsync(AIServiceConnector!, request.ServiceSetting);
+            }
+
+            return chatHistory;
     }
 
     public override async Task<ChatHistory> GenerateTextAsync(TextGenerationRequest request)
