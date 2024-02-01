@@ -82,8 +82,8 @@
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QASkill\Question\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\Default\skprompt.txt" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\config.json" />
-    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearch\skprompt.txt" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearchEngine\config.json" />
+    <Content Include="bin\Debug\net8.0\Plugins\Semantic\QuerySkill\WithSearchEngine\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\config.json" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\MakeAbstractReadable\skprompt.txt" />
     <Content Include="bin\Debug\net8.0\Plugins\Semantic\SummarizeSkill\Notegen\config.json" />
